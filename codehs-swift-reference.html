@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swift Reference · 35 Progressive Programs</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #eeede9;
+    --text: #1a1a18;
+    --text-secondary: #5c5c58;
+    --text-tertiary: #8f8f8a;
+    --border: rgba(0,0,0,0.12);
+    --border-md: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    --mono: "JetBrains Mono", "SF Mono", "Fira Code", "Cascadia Code", Consolas, monospace;
+    --lv1-bg:#E1F5EE; --lv1-text:#085041;
+    --lv2-bg:#E6F1FB; --lv2-text:#0C447C;
+    --lv3-bg:#FAEEDA; --lv3-text:#633806;
+    --lv4-bg:#FBEAF0; --lv4-text:#72243E;
+    --lv5-bg:#EEEDFE; --lv5-text:#3C3489;
+    --lv6-bg:#EAF3DE; --lv6-text:#27500A;
+    --lv7-bg:#FAECE7; --lv7-text:#712B13;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#1c1c1a; --bg-secondary:#252523; --bg-tertiary:#2e2e2b;
+      --text:#f0f0ec; --text-secondary:#a8a8a2; --text-tertiary:#6e6e68;
+      --border:rgba(255,255,255,0.10); --border-md:rgba(255,255,255,0.20);
+      --lv1-bg:#085041; --lv1-text:#9FE1CB;
+      --lv2-bg:#0C447C; --lv2-text:#B5D4F4;
+      --lv3-bg:#633806; --lv3-text:#FAC775;
+      --lv4-bg:#72243E; --lv4-text:#F4C0D1;
+      --lv5-bg:#3C3489; --lv5-text:#CECBF6;
+      --lv6-bg:#27500A; --lv6-text:#C0DD97;
+      --lv7-bg:#712B13; --lv7-text:#F5C4B3;
+    }
+  }
+
+  body { font-family:var(--font); background:var(--bg-tertiary); color:var(--text); line-height:1.6; min-height:100vh; }
+
+  header {
+    background:var(--bg); border-bottom:1px solid var(--border);
+    padding:20px 32px 16px; position:sticky; top:0; z-index:100;
+  }
+  .header-top {
+    display:flex; align-items:flex-start; justify-content:space-between;
+    gap:16px; margin-bottom:14px; flex-wrap:wrap;
+  }
+  .header-title h1 { font-size:18px; font-weight:600; color:var(--text); letter-spacing:-0.3px; }
+  .header-title p  { font-size:13px; color:var(--text-secondary); margin-top:2px; }
+  .swift-badge {
+    display:flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+    padding:4px 12px; border-radius:99px; background:var(--lv7-bg); color:var(--lv7-text);
+    white-space:nowrap; align-self:center; letter-spacing:0.3px;
+  }
+  .swift-badge svg { width:14px; height:14px; }
+
+  .toolbar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .search-wrap { position:relative; flex:1; min-width:180px; max-width:300px; }
+  .search-wrap svg { position:absolute; left:10px; top:50%; transform:translateY(-50%); color:var(--text-tertiary); pointer-events:none; }
+  #search {
+    width:100%; padding:7px 10px 7px 34px; font-size:13px; font-family:var(--font);
+    border:1px solid var(--border-md); border-radius:var(--radius-md);
+    background:var(--bg-secondary); color:var(--text); outline:none; transition:border-color .15s;
+  }
+  #search:focus { border-color:#F26207; }
+  #search::placeholder { color:var(--text-tertiary); }
+
+  .tabs { display:flex; gap:4px; flex-wrap:wrap; }
+  .tab {
+    padding:5px 12px; font-size:12px; font-weight:500; font-family:var(--font);
+    border:1px solid var(--border-md); border-radius:var(--radius-md);
+    background:transparent; color:var(--text-secondary); cursor:pointer; transition:all .15s; white-space:nowrap;
+  }
+  .tab:hover { background:var(--bg-secondary); color:var(--text); }
+  .tab.active { background:var(--bg-secondary); color:var(--text); box-shadow:inset 0 0 0 1px var(--border-md); }
+  .count { margin-left:auto; font-size:12px; color:var(--text-tertiary); white-space:nowrap; }
+
+  /* ── Swift note banner ── */
+  .compat-note {
+    background:var(--lv3-bg); color:var(--lv3-text); font-size:12px;
+    padding:8px 32px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px;
+  }
+  .compat-note svg { width:14px; height:14px; flex-shrink:0; }
+
+  main { max-width:860px; margin:0 auto; padding:20px 24px 60px; }
+
+  .level-header {
+    display:flex; align-items:center; gap:10px;
+    margin:28px 0 10px; padding-bottom:8px; border-bottom:1px solid var(--border);
+  }
+  .level-header:first-child { margin-top:0; }
+  .level-tag { font-size:11px; font-weight:600; letter-spacing:0.5px; text-transform:uppercase; padding:3px 10px; border-radius:99px; }
+  .level-header h2 { font-size:15px; font-weight:500; color:var(--text-secondary); }
+  .level-count { font-size:12px; color:var(--text-tertiary); margin-left:auto; }
+
+  .card {
+    background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-lg);
+    margin-bottom:8px; overflow:hidden; transition:border-color .15s, box-shadow .15s;
+  }
+  .card:hover { border-color:var(--border-md); }
+  .card.open { box-shadow:0 2px 12px rgba(0,0,0,0.07); }
+
+  .card-header {
+    display:flex; align-items:center; gap:10px;
+    padding:12px 16px; cursor:pointer; user-select:none;
+  }
+  .prog-num { font-size:11px; font-weight:600; color:var(--text-tertiary); min-width:26px; }
+  .prog-title { font-size:14px; font-weight:500; color:var(--text); flex:1; }
+  .level-pill { font-size:11px; font-weight:500; padding:2px 9px; border-radius:99px; white-space:nowrap; }
+  .lv1 { background:var(--lv1-bg); color:var(--lv1-text); }
+  .lv2 { background:var(--lv2-bg); color:var(--lv2-text); }
+  .lv3 { background:var(--lv3-bg); color:var(--lv3-text); }
+  .lv4 { background:var(--lv4-bg); color:var(--lv4-text); }
+  .lv5 { background:var(--lv5-bg); color:var(--lv5-text); }
+  .lv6 { background:var(--lv6-bg); color:var(--lv6-text); }
+  .lv7 { background:var(--lv7-bg); color:var(--lv7-text); }
+
+  .chevron { width:16px; height:16px; color:var(--text-tertiary); transition:transform .2s; flex-shrink:0; }
+  .card.open .chevron { transform:rotate(180deg); }
+
+  .card-body { display:none; border-top:1px solid var(--border); }
+  .card.open .card-body { display:block; }
+
+  /* Swift vs JS diff badge */
+  .diff-tag {
+    display:inline-block; font-size:10px; font-weight:600; letter-spacing:0.4px;
+    text-transform:uppercase; padding:1px 7px; border-radius:99px; margin-right:4px;
+    background:var(--lv7-bg); color:var(--lv7-text);
+  }
+  .teacher-note {
+    font-size:13px; color:var(--text-secondary); line-height:1.6;
+    padding:10px 16px 8px; border-bottom:1px dashed var(--border);
+  }
+  .teacher-note strong { font-weight:600; color:var(--text); }
+
+  .code-wrap { position:relative; }
+  .copy-btn {
+    position:absolute; top:10px; right:10px;
+    display:flex; align-items:center; gap:5px;
+    padding:5px 11px; font-size:12px; font-family:var(--font); font-weight:500;
+    border:1px solid var(--border-md); border-radius:var(--radius-md);
+    background:var(--bg); color:var(--text-secondary); cursor:pointer; transition:all .15s; z-index:2;
+  }
+  .copy-btn:hover { color:var(--text); background:var(--bg-secondary); }
+  .copy-btn.copied { color:#0F6E56; border-color:#0F6E56; }
+  .copy-btn svg { width:14px; height:14px; }
+
+  pre {
+    margin:0; padding:14px 16px 16px; font-family:var(--mono); font-size:13px;
+    line-height:1.7; overflow-x:auto; background:var(--bg-secondary); color:var(--text); tab-size:4;
+  }
+
+  /* Swift syntax colors */
+  .kw   { color:#9B2A8A; font-weight:500; }
+  .type { color:#3B6EA5; font-weight:500; }
+  .fn   { color:#0F6E56; }
+  .str  { color:#993C1D; }
+  .num  { color:#185FA5; }
+  .cmt  { color:var(--text-tertiary); font-style:italic; }
+  .interp { color:#7B4F00; }
+  @media (prefers-color-scheme: dark) {
+    .kw   { color:#E07BE0; }
+    .type { color:#85B7EB; font-weight:500; }
+    .fn   { color:#5DCAA5; }
+    .str  { color:#F0997B; }
+    .num  { color:#85B7EB; }
+    .interp { color:#FAC775; }
+  }
+
+  .empty { text-align:center; padding:60px 20px; color:var(--text-tertiary); font-size:14px; }
+  .empty svg { margin-bottom:10px; }
+
+  footer {
+    text-align:center; padding:20px; font-size:12px; color:var(--text-tertiary);
+    border-top:1px solid var(--border); background:var(--bg);
+  }
+
+  @media (max-width:600px) {
+    header { padding:14px 16px 12px; }
+    main { padding:14px 12px 40px; }
+    .search-wrap { max-width:100%; }
+    .compat-note { padding:8px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="header-title">
+      <h1>Swift Reference</h1>
+      <p>35 progressive programs for live coding · Blue Valley 229</p>
+    </div>
+    <span class="swift-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2"/><path d="M8 12.5s1.5 2 4 2 4-2 4-2M8.5 8.5c0 0 1 1 3.5 1s3.5-1 3.5-1"/></svg>
+      Swift 5
+    </span>
+  </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search" placeholder="Search programs, concepts…" oninput="filterAll()" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <span class="count" id="count"></span>
+  </div>
+</header>
+
+<div class="compat-note">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+  All programs use standard Swift 5. Works in CodeHS, Xcode Playgrounds, and Swift Playgrounds (iPad). User input via readLine() — works in CodeHS and Xcode; Swift Playgrounds (iPad) uses its own input model.
+</div>
+
+<main id="main"></main>
+
+<footer>
+  Swift Reference · Blue Valley 229 Computer Science · Key differences from JavaScript: print() · String interpolation \() · var/let · ranges (1...10) · switch without break · .count not .length
+</footer>
+
+<script>
+const LEVELS = [
+  { id:0, label:"All" },
+  { id:1, label:"Level 1", name:"Output & Variables",    cls:"lv1" },
+  { id:2, label:"Level 2", name:"User Input",            cls:"lv2" },
+  { id:3, label:"Level 3", name:"Conditionals & Switch", cls:"lv3" },
+  { id:4, label:"Level 4", name:"Loops & Ranges",        cls:"lv4" },
+  { id:5, label:"Level 5", name:"Functions",             cls:"lv5" },
+  { id:6, label:"Level 6", name:"Arrays & Collections",  cls:"lv6" },
+  { id:7, label:"Level 7", name:"Optionals & Structs",   cls:"lv7" },
+];
+
+const PROGRAMS = [
+
+// ── LEVEL 1 ────────────────────────────────────────────────────────────────
+{ n:1, lv:1, title:"Hello, World!", diff:true,
+  note:`<strong>First Swift program.</strong> <span class="diff-tag">vs JS</span> Swift uses <code>print()</code> — no parentheses on function calls are optional in older Swift, but always use them. No semicolons needed. Compare to JS's println() in CodeHS.`,
+  code:`// My first Swift program
+print("Hello, World!")
+print("Welcome to Computer Science!")` },
+
+{ n:2, lv:1, title:"var vs let", diff:true,
+  note:`<strong>Two kinds of variables.</strong> <span class="diff-tag">vs JS</span> Swift has <code>var</code> (changeable) and <code>let</code> (constant). JS uses <code>var</code> for everything. Ask students: why would we ever want a variable we can't change?`,
+  code:`var name    = "Ms. Johnson"     // var: can change
+let subject = "Computer Science"  // let: locked forever
+var grade   = 7
+
+print("Name: \(name)")
+print("Subject: \(subject)")
+print("Grade: \(grade)")
+
+name = "Mr. Smith"   // works — var
+print("New name: \(name)")
+// subject = "Math"  // ERROR — let cannot be changed` },
+
+{ n:3, lv:1, title:"String interpolation", diff:true,
+  note:`<strong>Swift's cleaner way to combine strings.</strong> <span class="diff-tag">vs JS</span> Instead of JS's <code>"Hello " + name</code>, Swift uses <code>"Hello \\(name)"</code> — the backslash-parentheses syntax. Students usually find it more readable.`,
+  code:`let first = "Alex"
+let last  = "Rivera"
+let full  = "\(first) \(last)"
+
+print("Full name:  \(full)")
+print("Uppercase:  \(full.uppercased())")   // not .toUpperCase()
+print("Lowercase:  \(full.lowercased())")
+print("Length:     \(full.count) chars")    // not .length
+print("First char: \(first.first!)")` },
+
+{ n:4, lv:1, title:"Arithmetic & type safety", diff:true,
+  note:`<strong>Swift is type-strict.</strong> <span class="diff-tag">vs JS</span> You can't mix Int and Double without converting. Also: Int division stays Int — 15/4 = 3, not 3.75. This trips students up coming from JS. Demo the error live, then fix it.`,
+  code:`let a = 15
+let b = 4
+
+print("\(a) + \(b) = \(a + b)")
+print("\(a) - \(b) = \(a - b)")
+print("\(a) * \(b) = \(a * b)")
+print("\(a) / \(b) = \(a / b)")    // Int division! = 3
+print("\(a) % \(b) = \(a % b)")
+
+// For decimal division, use Double
+let x: Double = 15
+let y: Double = 4
+print("\(x) / \(y) = \(x / y)")   // = 3.75` },
+
+{ n:5, lv:1, title:"Data types showcase", diff:true,
+  note:`<strong>Swift's type system.</strong> <span class="diff-tag">vs JS</span> Swift types are explicit: <code>Int</code>, <code>Double</code>, <code>String</code>, <code>Bool</code>. You can add type annotations or let Swift infer. Show both styles and discuss when each is useful.`,
+  code:`// Swift infers the type from the value
+var myString  = "Hello CS!"
+var myInt     = 42
+var myDouble  = 3.14159
+var myBool    = true
+
+// Or declare the type explicitly
+var score: Int    = 100
+var gpa: Double   = 3.85
+var name: String  = "Alex"
+
+print("String: \(myString)")
+print("Int: \(myInt), squared: \(myInt * myInt)")
+print("Double: \(myDouble)")
+print("Bool: \(myBool)")
+print(String(format: "GPA: %.2f", gpa))` },
+
+// ── LEVEL 2 ────────────────────────────────────────────────────────────────
+{ n:6, lv:2, title:"Name greeter", diff:true,
+  note:`<strong>First readLine().</strong> <span class="diff-tag">vs JS</span> readLine() returns an <em>optional</em> String — it might be nil if there's no input. The <code>?? "default"</code> provides a fallback. This is safe Swift — no crashes from missing input.`,
+  code:`print("What is your name?")
+let name = readLine() ?? "friend"   // ?? = "if nil, use this instead"
+
+print("Hello, \(name)!")
+print("Welcome to Computer Science, \(name).")` },
+
+{ n:7, lv:2, title:"Age calculator", diff:true,
+  note:`<strong>Converting input to Int.</strong> <span class="diff-tag">vs JS</span> readLine() always gives a String. To do math, wrap it: <code>Int(readLine() ?? "")</code>. That itself is optional, so <code>?? 0</code> gives a safe default. Chain of safety!`,
+  code:`print("What is your name?")
+let name = readLine() ?? ""
+
+print("What year were you born?")
+let birthYear = Int(readLine() ?? "") ?? 2000
+let currentYear = 2025
+let age = currentYear - birthYear
+
+print("\(name), you are about \(age) years old.")
+print("In 10 years you will be \(age + 10).")` },
+
+{ n:8, lv:2, title:"Rectangle calculator", diff:true,
+  note:`<strong>Reading Double input.</strong> <span class="diff-tag">vs JS</span> Same pattern as Int but with <code>Double()</code>. Note: Swift needs explicit conversion between Int and Double — you can't add them directly.`,
+  code:`print("Enter length:")
+let length = Double(readLine() ?? "") ?? 0.0
+
+print("Enter width:")
+let width = Double(readLine() ?? "") ?? 0.0
+
+let area      = length * width
+let perimeter = 2 * (length + width)
+
+print("--- Rectangle ---")
+print("Area:      \(area) sq units")
+print("Perimeter: \(perimeter) units")` },
+
+{ n:9, lv:2, title:"Temperature converter", diff:true,
+  note:`<strong>String(format:) for decimal display.</strong> <span class="diff-tag">vs JS</span> Swift doesn't have .toFixed(). Instead use <code>String(format: "%.2f", value)</code> — same as C's printf. This is more powerful but initially less obvious than JS.`,
+  code:`print("Temperature in Fahrenheit:")
+let fahrenheit = Double(readLine() ?? "") ?? 32.0
+let celsius    = (fahrenheit - 32) * 5 / 9
+
+print(String(format: "%.1f°F = %.2f°C", fahrenheit, celsius))` },
+
+{ n:10, lv:2, title:"Four-function calculator", diff:true,
+  note:`<strong>Mixing types and guarding division.</strong> Using Double for all math avoids integer-division surprises. The division guard previews conditionals ahead — good to leave it unexplained and let students ask why.`,
+  code:`print("First number:")
+let a = Double(readLine() ?? "") ?? 0.0
+
+print("Second number:")
+let b = Double(readLine() ?? "") ?? 0.0
+
+print("--- Results ---")
+print("\(a) + \(b) = \(a + b)")
+print("\(a) - \(b) = \(a - b)")
+print("\(a) * \(b) = \(a * b)")
+
+if b != 0 {
+    print(String(format: "%.2f / %.2f = %.2f", a, b, a / b))
+} else {
+    print("Cannot divide by zero!")
+}` },
+
+// ── LEVEL 3 ────────────────────────────────────────────────────────────────
+{ n:11, lv:3, title:"Positive, negative, or zero", diff:false,
+  note:`<strong>if / else if / else — nearly identical to JS.</strong> The logic is the same; only the syntax differs slightly. No parentheses required around the condition in Swift, though they're allowed. Great bridge moment from their JS experience.`,
+  code:`print("Enter a number:")
+let num = Double(readLine() ?? "") ?? 0.0
+
+if num > 0 {
+    print("\(num) is POSITIVE")
+} else if num < 0 {
+    print("\(num) is NEGATIVE")
+} else {
+    print("The number is ZERO")
+}` },
+
+{ n:12, lv:3, title:"Even or odd", diff:true,
+  note:`<strong>== not ===.</strong> <span class="diff-tag">vs JS</span> Swift uses <code>==</code> for equality — there's no triple-equals because Swift's type system prevents accidental type mismatches that JS's === guards against.`,
+  code:`print("Enter a whole number:")
+let num = Int(readLine() ?? "") ?? 0
+
+if num % 2 == 0 {
+    print("\(num) is EVEN")
+} else {
+    print("\(num) is ODD")
+}` },
+
+{ n:13, lv:3, title:"Grade classifier", diff:false,
+  note:`<strong>Chained else-if, same as JS.</strong> Relatable context — and students who already built this in JS can focus entirely on Swift syntax differences rather than logic. Swap two branches live to demo why order matters.`,
+  code:`print("Enter your score (0-100):")
+let score = Int(readLine() ?? "") ?? 0
+var grade: String
+
+if score >= 90 {
+    grade = "A"
+} else if score >= 80 {
+    grade = "B"
+} else if score >= 70 {
+    grade = "C"
+} else if score >= 60 {
+    grade = "D"
+} else {
+    grade = "F"
+}
+
+print("Score: \(score) → Grade: \(grade)")` },
+
+{ n:14, lv:3, title:"Switch statement", diff:true,
+  note:`<strong>Swift's switch is far more powerful than JS's.</strong> <span class="diff-tag">vs JS</span> No break needed — Swift doesn't fall through by default. Cases can match ranges (3...5), multiple values (6, 7), and more. Show the JS version side-by-side if possible.`,
+  code:`print("Enter a day number (1-7):")
+let day = Int(readLine() ?? "") ?? 0
+
+switch day {
+case 1:
+    print("Monday — start of the week!")
+case 2:
+    print("Tuesday")
+case 3:
+    print("Wednesday — halfway there!")
+case 4:
+    print("Thursday")
+case 5:
+    print("Friday — almost there!")
+case 6, 7:                   // multiple values in one case
+    print("Weekend!")
+default:
+    print("Invalid day number")
+}` },
+
+{ n:15, lv:3, title:"Rock, Paper, Scissors", diff:true,
+  note:`<strong>Int.random(in:) and ranges.</strong> <span class="diff-tag">vs JS</span> Swift uses <code>Int.random(in: 0..<3)</code> instead of JS's <code>Math.floor(Math.random() * 3)</code>. Much cleaner! The half-open range <code>0..<3</code> means 0, 1, 2 — not including 3.`,
+  code:`let choices  = ["Rock", "Paper", "Scissors"]
+print("Rock, Paper, or Scissors?")
+let player   = readLine() ?? ""
+let idx      = Int.random(in: 0..<3)   // 0, 1, or 2
+let computer = choices[idx]
+
+print("You:      \(player)")
+print("Computer: \(computer)")
+
+if player == computer {
+    print("It's a TIE!")
+} else if (player == "Rock"     && computer == "Scissors") ||
+          (player == "Paper"    && computer == "Rock")     ||
+          (player == "Scissors" && computer == "Paper") {
+    print("You WIN!")
+} else {
+    print("Computer wins.")
+}` },
+
+{ n:16, lv:3, title:"Season finder with switch + ranges", diff:true,
+  note:`<strong>Ranges inside switch — a Swift superpower.</strong> <span class="diff-tag">vs JS</span> <code>case 3...5</code> matches any value from 3 through 5. This would need three separate if-conditions in JS. Students who built the JS version will immediately appreciate this.`,
+  code:`print("Enter a month number (1-12):")
+let month = Int(readLine() ?? "") ?? 0
+
+switch month {
+case 12, 1, 2:     // multiple values
+    print("Month \(month) → Winter ❄️")
+case 3...5:         // closed range
+    print("Month \(month) → Spring 🌸")
+case 6...8:
+    print("Month \(month) → Summer ☀️")
+case 9...11:
+    print("Month \(month) → Fall 🍂")
+default:
+    print("Invalid month number")
+}` },
+
+// ── LEVEL 4 ────────────────────────────────────────────────────────────────
+{ n:17, lv:4, title:"Count up and down", diff:true,
+  note:`<strong>for-in with ranges.</strong> <span class="diff-tag">vs JS</span> Instead of JS's <code>for (var i = 1; i <= n; i++)</code>, Swift uses <code>for i in 1...limit</code>. Counting down requires <code>stride(from:through:by:)</code>. The range syntax is cleaner but stride takes getting used to.`,
+  code:`print("Count up to:")
+let limit = Int(readLine() ?? "") ?? 10
+
+print("Up: ", terminator: "")          // terminator:"" stops auto-newline
+for i in 1...limit {
+    print("\(i) ", terminator: "")
+}
+print("")
+
+print("Down: ", terminator: "")
+for i in stride(from: limit, through: 1, by: -1) {
+    print("\(i) ", terminator: "")
+}
+print("")` },
+
+{ n:18, lv:4, title:"Sum and average 1 to N", diff:false,
+  note:`<strong>Accumulator pattern in Swift.</strong> Same concept as JS — sum starts at 0, loop adds each number. Only difference: Swift range <code>1...n</code> replaces the JS for-loop header. Great to have students predict the output before running.`,
+  code:`print("Enter N:")
+let n   = Int(readLine() ?? "") ?? 10
+var sum = 0
+
+for i in 1...n {
+    sum += i
+}
+
+let avg = Double(sum) / Double(n)   // convert Int to Double for division
+print("Sum 1 to \(n) = \(sum)")
+print(String(format: "Average = %.2f", avg))` },
+
+{ n:19, lv:4, title:"Multiplication table", diff:false,
+  note:`<strong>Simple for-in loop with computation.</strong> Same logic as JS, just cleaner range syntax. After running it, challenge: change 12 to a user input. Then: print it as a two-column table with String(format:).`,
+  code:`print("Times table for:")
+let num = Int(readLine() ?? "") ?? 5
+
+print("--- \(num) Times Table ---")
+for i in 1...12 {
+    print("\(num) x \(i) = \(num * i)")
+}` },
+
+{ n:20, lv:4, title:"FizzBuzz", diff:false,
+  note:`<strong>The classic — same logic, Swift syntax.</strong> Students who solved FizzBuzz in JS can race to write this version before you finish live-coding it. Exact same algorithm, just Swift range and no semicolons. Remind them: it's still a real interview question.`,
+  code:`print("FizzBuzz up to:")
+let limit = Int(readLine() ?? "") ?? 30
+
+for i in 1...limit {
+    if i % 15 == 0 {
+        print("FizzBuzz")
+    } else if i % 3 == 0 {
+        print("Fizz")
+    } else if i % 5 == 0 {
+        print("Buzz")
+    } else {
+        print(i)
+    }
+}` },
+
+{ n:21, lv:4, title:"Number guessing game", diff:true,
+  note:`<strong>while loop + Int.random(in:).</strong> <span class="diff-tag">vs JS</span> Note the clean random range: <code>Int.random(in: 1...100)</code>. No Math.floor needed! Same game logic as JS — students who built it there will focus entirely on the Swift differences.`,
+  code:`let secret   = Int.random(in: 1...100)
+var guess    = 0
+var attempts = 0
+
+print("Guess a number between 1 and 100!")
+
+while guess != secret {
+    guess = Int(readLine() ?? "") ?? 0
+    attempts += 1
+    if guess < secret {
+        print("Too LOW! Try again.")
+    } else if guess > secret {
+        print("Too HIGH! Try again.")
+    } else {
+        print("CORRECT in \(attempts) attempts!")
+    }
+}` },
+
+{ n:22, lv:4, title:"Triangle star printer", diff:true,
+  note:`<strong>Nested loops + the underscore.</strong> <span class="diff-tag">vs JS</span> When you don't use the loop variable, Swift convention is to write <code>_</code> instead of a name. It signals intent: "I'm looping N times, not using the counter." Introduce it as Swift's way of saying "I don't care about this value."`,
+  code:`print("How many rows?")
+let rows = Int(readLine() ?? "") ?? 5
+
+for i in 1...rows {
+    var line = ""
+    for _ in 1...i {     // _ means "I'm not using this counter"
+        line += "* "
+    }
+    print(line)
+}` },
+
+// ── LEVEL 5 ────────────────────────────────────────────────────────────────
+{ n:23, lv:5, title:"Functions: greet and farewell", diff:true,
+  note:`<strong>Swift function syntax.</strong> <span class="diff-tag">vs JS</span> Functions need parameter type annotations (<code>name: String</code>) and a return type (<code>-> String</code>). Also: callers must use the parameter label: <code>greet(name: name)</code>. More explicit than JS, but self-documenting.`,
+  code:`func greet(name: String) -> String {
+    return "Hello, \(name)! Welcome to CS!"
+}
+
+func farewell(name: String) -> String {
+    return "Goodbye, \(name)! Keep coding!"
+}
+
+print("Your name:")
+let name = readLine() ?? "friend"
+
+print(greet(name: name))      // notice: labeled argument
+print(farewell(name: name))` },
+
+{ n:24, lv:5, title:"Circle calculator (functions)", diff:true,
+  note:`<strong>Double.pi and return types.</strong> <span class="diff-tag">vs JS</span> Swift uses <code>Double.pi</code> (not Math.PI). The <code>-> Double</code> return type annotation makes the function's contract explicit — great habit for student code readability.`,
+  code:`func circleArea(radius: Double) -> Double {
+    return Double.pi * radius * radius
+}
+
+func circumference(radius: Double) -> Double {
+    return 2 * Double.pi * radius
+}
+
+print("Enter radius:")
+let r = Double(readLine() ?? "") ?? 1.0
+
+print(String(format: "Area:          %.2f", circleArea(radius: r)))
+print(String(format: "Circumference: %.2f", circumference(radius: r)))` },
+
+{ n:25, lv:5, title:"Is it prime?", diff:true,
+  note:`<strong>Function returning Bool + underscore label.</strong> <span class="diff-tag">vs JS</span> The <code>_ num: Int</code> means callers write <code>isPrime(17)</code> with no label, matching JS style. Show both labeled and unlabeled versions — discuss the tradeoff of readability vs. brevity.`,
+  code:`func isPrime(_ num: Int) -> Bool {
+    if num < 2 { return false }
+    let limit = Int(Double(num).squareRoot())
+    for i in 2...limit {
+        if num % i == 0 { return false }
+    }
+    return true
+}
+
+print("Enter a number:")
+let n = Int(readLine() ?? "") ?? 0
+
+if isPrime(n) {
+    print("\(n) IS prime.")
+} else {
+    print("\(n) is NOT prime.")
+}` },
+
+{ n:26, lv:5, title:"Factorial (recursive)", diff:false,
+  note:`<strong>Recursion — same concept, Swift syntax.</strong> The logic is identical to the JS version. Key addition: the return type <code>-> Int</code> must be declared. Draw the call stack for factorial(4) on the board — same base case, same recursive case.`,
+  code:`func factorial(_ n: Int) -> Int {
+    if n == 0 || n == 1 {
+        return 1                   // base case
+    }
+    return n * factorial(n - 1)   // recursive case
+}
+
+print("Enter a number (0-12):")
+let num = Int(readLine() ?? "") ?? 0
+print("\(num)! = \(factorial(num))")` },
+
+{ n:27, lv:5, title:"Mini trivia quiz", diff:true,
+  note:`<strong>inout vs shared var — a teaching moment.</strong> <span class="diff-tag">vs JS</span> Swift functions can't accidentally modify outer variables — shown here using a global var like JS. Optionally introduce <code>inout</code> as the Swift way to explicitly pass by reference. Great discussion: why is explicit safer?`,
+  code:`var score = 0
+
+func ask(_ question: String, answer: String) {
+    print(question)
+    let response = readLine() ?? ""
+    if response.lowercased() == answer.lowercased() {
+        print("Correct!")
+        score += 1
+    } else {
+        print("Wrong -- answer: \(answer)")
+    }
+}
+
+print("=== CS Trivia ===")
+ask("What does CPU stand for?",  answer: "Central Processing Unit")
+ask("How many bits in a byte?",  answer: "8")
+ask("What does HTML stand for?", answer: "HyperText Markup Language")
+print("Score: \(score) / 3")` },
+
+// ── LEVEL 6 ────────────────────────────────────────────────────────────────
+{ n:28, lv:6, title:"Array roster", diff:true,
+  note:`<strong>Swift arrays + .enumerated().</strong> <span class="diff-tag">vs JS</span> Swift's for-in gives values directly: <code>for student in students</code>. To get the index too, use <code>.enumerated()</code> which gives (index, value) tuples. Much cleaner than a manual counter. Also: <code>.count</code> not <code>.length</code>.`,
+  code:`let students = ["Alex", "Jordan", "Taylor", "Morgan", "Casey"]
+
+print("Class Roster:")
+for (i, student) in students.enumerated() {
+    print("\(i + 1). \(student)")
+}
+print("Total: \(students.count) students")` },
+
+{ n:29, lv:6, title:"Find min and max", diff:true,
+  note:`<strong>Manual search + built-in shortcut.</strong> Build the min/max manually first so students understand the algorithm, then reveal <code>.min()</code> and <code>.max()</code> as Swift's built-in shortcuts. The <code>!</code> force-unwrap is safe here because we know the array isn't empty.`,
+  code:`let nums = [42, 7, 19, 85, 3, 61, 28]
+var minVal = nums[0]
+var maxVal = nums[0]
+
+for num in nums {
+    if num < minVal { minVal = num }
+    if num > maxVal { maxVal = num }
+}
+
+print("Array:          \(nums)")
+print("Manual min:     \(minVal)")
+print("Manual max:     \(maxVal)")
+print("Built-in min(): \(nums.min()!)")
+print("Built-in max(): \(nums.max()!)")` },
+
+{ n:30, lv:6, title:"Grade book averager", diff:true,
+  note:`<strong>Parallel arrays and Int→Double conversion.</strong> <span class="diff-tag">vs JS</span> Swift requires explicit conversion: <code>Double(total) / Double(scores.count)</code>. Int/Int gives Int. This strict behavior catches real bugs — worth discussing why languages make this choice.`,
+  code:`let names  = ["Alex", "Jordan", "Taylor", "Morgan"]
+let scores = [88, 72, 95, 63]
+var total  = 0
+
+print("=== Grade Book ===")
+for i in 0..<names.count {
+    print("\(names[i]): \(scores[i])")
+    total += scores[i]
+}
+
+let avg = Double(total) / Double(scores.count)
+print(String(format: "Class average: %.1f", avg))` },
+
+{ n:31, lv:6, title:"User-built shopping list", diff:true,
+  note:`<strong>Mutable arrays with append().</strong> <span class="diff-tag">vs JS</span> Swift uses <code>append()</code> (not push). Must declare as <code>var</code> — arrays declared with <code>let</code> are immutable in Swift. Show the error if you try <code>let list</code> and then append.`,
+  code:`var list: [String] = []   // must be var to append!
+
+print("Add item (or 'done' to stop):")
+var item = readLine() ?? ""
+
+while item != "done" {
+    list.append(item)         // append() not push()
+    print("Add item (or 'done' to stop):")
+    item = readLine() ?? ""
+}
+
+print("=== Your List (\(list.count) items) ===")
+for (i, entry) in list.enumerated() {
+    print("  \(i + 1). \(entry)")
+}` },
+
+{ n:32, lv:6, title:"Sorted and reversed arrays", diff:true,
+  note:`<strong>Swift's clean sort syntax.</strong> <span class="diff-tag">vs JS</span> <code>.sorted()</code> works with no arguments for natural order. <code>.sorted(by: >)</code> reverses it — no compare function needed. <code>.reversed()</code> returns a special type, so wrap it in <code>Array()</code> to print nicely.`,
+  code:`let nums       = [5, 2, 8, 1, 9, 3, 7]
+let ascending  = nums.sorted()          // low to high
+let descending = nums.sorted(by: >)     // high to low — no comparator needed!
+let reversed   = Array(nums.reversed())
+
+print("Original:   \(nums)")
+print("Ascending:  \(ascending)")
+print("Descending: \(descending)")
+print("Reversed:   \(reversed)")` },
+
+// ── LEVEL 7 ────────────────────────────────────────────────────────────────
+{ n:33, lv:7, title:"Optionals — Swift's safety net", diff:true,
+  note:`<strong>Swift's most distinctive feature.</strong> <span class="diff-tag">vs JS</span> JS has undefined and null — they sneak up on you. Swift makes maybe-nil explicit with <code>?</code>. You have to consciously handle the nil case. <code>if let</code> safely unwraps. This is why Swift crashes less than JS at runtime.`,
+  code:`// An optional can hold a value OR nil
+var name: String? = "Alex"
+print("Optional: \(name ?? "no name")")   // ?? provides a fallback
+
+// Safe unwrapping with if let
+if let safeName = name {
+    print("Hello, \(safeName)!")    // only runs if name is not nil
+} else {
+    print("No name provided.")
+}
+
+// Setting to nil
+name = nil
+print("After nil: \(name ?? "empty")")
+
+// Guard let — early exit style (common in real Swift apps)
+func greetSafely(_ possibleName: String?) {
+    guard let n = possibleName else {
+        print("No name given!")
+        return
+    }
+    print("Hello, \(n)!")
+}
+greetSafely("Jordan")
+greetSafely(nil)` },
+
+{ n:34, lv:7, title:"Dictionary (key-value pairs)", diff:true,
+  note:`<strong>Swift Dictionaries.</strong> <span class="diff-tag">vs JS</span> Similar to JS objects used as maps, but with explicit key and value types: <code>[String: String]</code>. Dictionary lookups return an optional — great reinforcement of optionals from #33. Use <code>if let</code> for safe lookup.`,
+  code:`var capitals: [String: String] = [
+    "Kansas":    "Topeka",
+    "Missouri":  "Jefferson City",
+    "Colorado":  "Denver",
+    "Nebraska":  "Lincoln"
+]
+
+// Iterate (sorted for consistent output)
+print("=== State Capitals ===")
+for (state, capital) in capitals.sorted(by: { $0.key < $1.key }) {
+    print("\(state): \(capital)")
+}
+
+// Lookup — returns an Optional!
+print("\nLookup:")
+let state = "Kansas"
+if let capital = capitals[state] {
+    print("Capital of \(state) is \(capital).")
+} else {
+    print("\(state) not found.")
+}
+
+// Add a new entry
+capitals["Iowa"] = "Des Moines"
+print("Total states stored: \(capitals.count)")` },
+
+{ n:35, lv:7, title:"Struct: Contact Book (capstone)", diff:true,
+  note:`<strong>Structs — Swift's version of objects.</strong> <span class="diff-tag">vs JS</span> JS uses object literals; Swift uses <code>struct</code> to define a custom type with named properties. Structs are value types in Swift — copying creates a real copy, not a reference. This capstone ties together structs, arrays, functions, and optionals.`,
+  code:`// Define a custom data type
+struct Contact {
+    var name:  String
+    var phone: String
+}
+
+var contacts: [Contact] = []
+
+func addContact(name: String, phone: String) {
+    contacts.append(Contact(name: name, phone: phone))
+}
+
+func findContact(query: String) -> Contact? {    // returns Optional
+    for contact in contacts {
+        if contact.name.lowercased() == query.lowercased() {
+            return contact
+        }
+    }
+    return nil    // not found
+}
+
+// Pre-load contacts
+addContact(name: "Alex Rivera",   phone: "555-0101")
+addContact(name: "Jordan Park",   phone: "555-0202")
+addContact(name: "Taylor Morgan", phone: "555-0303")
+
+print("Contact book: \(contacts.count) entries.")
+print("Search name:")
+let query = readLine() ?? ""
+
+if let result = findContact(query: query) {
+    print("Found: \(result.name) -- \(result.phone)")
+} else {
+    print("No contact named '\(query)' found.")
+}` },
+
+]; // end PROGRAMS
+
+// ── State ──────────────────────────────────────────────────────────
+let activeLevel = 0;
+
+// ── Tabs ───────────────────────────────────────────────────────────
+function buildTabs() {
+  const c = document.getElementById("tabs");
+  LEVELS.forEach(lv => {
+    const btn = document.createElement("button");
+    btn.className = "tab" + (lv.id === 0 ? " active" : "");
+    btn.textContent = lv.id === 0 ? "All" : lv.label;
+    btn.onclick = () => {
+      window._activeLevel = lv.id;
+      document.querySelectorAll(".tab").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      render();
+    };
+    c.appendChild(btn);
+  });
+}
+window._activeLevel = 0;
+
+// ── Syntax highlight ───────────────────────────────────────────────
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function highlight(raw) {
+  return raw.split('\n').map(line => {
+    if (/^\s*\/\//.test(line)) return '<span class="cmt">' + esc(line) + '</span>';
+    let out = esc(line);
+    // inline comments first
+    out = out.replace(/(\/\/.*$)/g, '<span class="cmt">$1</span>');
+    // strings (including interpolation display — just color whole string)
+    out = out.replace(/("(?:[^"\\]|\\.)*")/g, '<span class="str">$1</span>');
+    // keywords
+    ['var','let','func','if','else','while','for','in','return','true','false',
+     'nil','switch','case','default','struct','import','guard','class','enum',
+     'inout','override','init','self','static','where'].forEach(k => {
+      out = out.replace(new RegExp('(?<![\\w])('+k+')(?![\\w])','g'), '<span class="kw">$1</span>');
+    });
+    // types
+    ['Int','Double','String','Bool','Character','Float','Array','Dictionary','Optional'].forEach(t => {
+      out = out.replace(new RegExp('(?<![\\w])('+t+')(?![\\w])','g'), '<span class="type">$1</span>');
+    });
+    // built-in functions/properties
+    ['print','readLine','append','count','sorted','reversed','enumerated',
+     'lowercased','uppercased','split','joined','contains','first','last',
+     'min','max','random','squareRoot','stride','terminator'].forEach(f => {
+      out = out.replace(new RegExp('(?<![\\w])('+f+')(?![\\w])','g'), '<span class="fn">$1</span>');
+    });
+    // numbers
+    out = out.replace(/(?<!["\w])(\b\d+\.?\d*\b)/g, '<span class="num">$1</span>');
+    return out;
+  }).join('\n');
+}
+
+// ── Copy ───────────────────────────────────────────────────────────
+function copyCode(idx, btn) {
+  const code = PROGRAMS[idx].code;
+  const doFallback = () => {
+    const ta = document.createElement("textarea");
+    ta.value = code;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    document.body.removeChild(ta);
+  };
+  const done = () => {
+    btn.classList.add("copied");
+    btn.innerHTML = iconCheck() + " Copied!";
+    setTimeout(() => { btn.classList.remove("copied"); btn.innerHTML = iconCopy() + " Copy"; }, 1800);
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(code).then(done).catch(() => { doFallback(); done(); });
+  } else { doFallback(); done(); }
+}
+
+function iconCopy() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+}
+function iconCheck() {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;
+}
+function iconChevron() {
+  return `<svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>`;
+}
+
+// ── Render ─────────────────────────────────────────────────────────
+function filterAll() { render(); }
+
+function render() {
+  const q = document.getElementById("search").value.toLowerCase().trim();
+  const al = window._activeLevel;
+  const filtered = PROGRAMS.filter(p => {
+    if (al && p.lv !== al) return false;
+    if (q) return (p.title + p.note + p.code).toLowerCase().includes(q);
+    return true;
+  });
+
+  document.getElementById("count").textContent =
+    filtered.length + " program" + (filtered.length !== 1 ? "s" : "");
+
+  const main = document.getElementById("main");
+  if (!filtered.length) {
+    main.innerHTML = `<div class="empty"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><br>No programs match your search.</div>`;
+    return;
+  }
+
+  const byLevel = {};
+  filtered.forEach(p => { if (!byLevel[p.lv]) byLevel[p.lv] = []; byLevel[p.lv].push(p); });
+  const showHeaders = al === 0 && !q;
+
+  let html = "";
+  Object.keys(byLevel).sort((a,b) => a-b).forEach(lv => {
+    const lvInfo = LEVELS.find(l => l.id === parseInt(lv));
+    if (showHeaders && lvInfo && lvInfo.id !== 0) {
+      html += `<div class="level-header">
+        <span class="level-tag lv${lv}">${lvInfo.label}</span>
+        <h2>${lvInfo.name}</h2>
+        <span class="level-count">${byLevel[lv].length} programs</span>
+      </div>`;
+    }
+    byLevel[lv].forEach(p => {
+      const lvInfo2 = LEVELS.find(l => l.id === p.lv);
+      const pill = lvInfo2 ? lvInfo2.label.replace("Level ","L") : "";
+      html += `<div class="card" id="card-${p.n}">
+        <div class="card-header" onclick="toggleCard(${p.n})" role="button" tabindex="0"
+             aria-expanded="false" onkeydown="if(event.key==='Enter'||event.key===' ')toggleCard(${p.n})">
+          <span class="prog-num">#${p.n}</span>
+          <span class="prog-title">${p.title}</span>
+          <span class="level-pill lv${p.lv}">${pill}</span>
+          ${iconChevron()}
+        </div>
+        <div class="card-body">
+          <div class="teacher-note">${p.note}</div>
+          <div class="code-wrap">
+            <button class="copy-btn" onclick="copyCode(${p.n - 1}, this)">${iconCopy()} Copy</button>
+            <pre><code>${highlight(p.code)}</code></pre>
+          </div>
+        </div>
+      </div>`;
+    });
+  });
+  main.innerHTML = html;
+}
+
+function toggleCard(n) {
+  const card = document.getElementById("card-" + n);
+  card.classList.toggle("open");
+  card.querySelector(".card-header").setAttribute("aria-expanded", card.classList.contains("open"));
+}
+
+buildTabs();
+render();
+</script>
+</body>
+</html>
